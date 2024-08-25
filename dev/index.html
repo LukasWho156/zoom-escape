@@ -1,0 +1,59 @@
+<html>
+    <head>
+        <title>My LutheAmp Game</title>
+        <link rel="stylesheet" href="styles.css">
+        <script src="main.js" defer></script>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    </head>
+    <body>
+        <div class="full">
+            <div class="gameContainer">
+                <div class="loading">Loading ...</div>
+                <dialog id="cookie-warning">
+                    <h2>Cookie Warning</h2>
+                    <hr>
+                    <p>
+                        This game uses cookies for solely functional purposes (save your game progress,
+                        store settings, etc.). Unfortunately, your cookie settings do not seem to allow
+                        this game to store cookies. Please consider adding an exception for this site
+                        to enjoy this game in the best way possible.
+                    </p>
+                    <form method="dialog">
+                        <button class="primary" value="cancel">
+                            Got it!
+                        </button>
+                    </form>
+                </dialog>
+                <dialog id="queryDialog">
+                    <h2>Enter Code:</h2>
+                    <form method="dialog">
+                        <input type="text" id="queryInput">
+                        <button class="primary" value="cancel">
+                            Submit
+                        </button>
+                    </form>
+                </dialog>
+                <dialog id="settingsDialog">
+                    <h2>Enter Code:</h2>
+                    <form method="dialog">
+                        <div>
+                            <label for="soundSlider">Sound:</label>
+                            <input type="range" id="soundSlider" min="0" max="1" value="1">
+                        </div>
+                        <div>
+                            <label for="musicSlider">Music:</label>
+                            <input type="range" id="musicSlider" min="0" max="1" value="0.7">
+                        </div>
+                        <div>
+                            <label for="sensitivitySlider">Scroll Sensitivity:</label>
+                            <input type="range" id="sensitivitySlider" min="0.001" max="0.005" value="0.0025">
+                        </div>
+                        <button class="primary" value="cancel">
+                            Okay
+                        </button>
+                    </form>
+                </dialog>
+            </div>
+        </div>
+    </body>
+</html>
