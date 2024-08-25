@@ -113,9 +113,14 @@ const makeMainScreen = async () => {
         creditBackdrop.visible = true;
     });
 
+    screen.addListener('mousemove', (event: MouseEvent) => {
+        roomSystem.bufferMouse(event.offsetX / 512, event.offsetY / 512);
+    })
+
     screen.addListener('wheel', (event: WheelEvent) => {
         event.preventDefault();
-        roomSystem.bufferZoom(event.deltaY, event.offsetX / 512, event.offsetY / 512);
+        roomSystem.bufferMouse(event.offsetX / 512, event.offsetY / 512)
+        roomSystem.bufferZoom(event.deltaY);
     });
 
     screen.addListener('pointerdown', (event: PointerEvent) => {
@@ -148,7 +153,8 @@ const makeMainScreen = async () => {
             );
             if(distance >= 0) {
                 if(Math.abs(distance - newDistance) <= 25) {
-                    roomSystem.bufferZoom(10 * (distance - newDistance), 0.5 / 512 * (x1 + x2), 0.5 / 512 * (y1 + y2));
+                    roomSystem.bufferMouse(0.5 / 512 * (x1 + x2), 0.5 / 512 * (y1 + y2));
+                    roomSystem.bufferZoom(10 * (distance - newDistance));
                 }
             }
             distance = newDistance;

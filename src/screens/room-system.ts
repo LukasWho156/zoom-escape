@@ -23,7 +23,10 @@ class RoomSystem {
         return this._ready;
     }
 
-    private zoomBuffer = { amount: 0, x: 0, y: 0};
+    private zoomBuffer = 0;
+    private mouseBuffer = { x: 0, y: 0 };
+    private targetOffset = { x: 0.5, y: 0.5 };
+    private currentOffset = { x: 0.5, y: 0.5 }
 
     private _autoZoom = false;
     get autoZoom() {
@@ -89,15 +92,18 @@ class RoomSystem {
         }
     }
 
-    bufferZoom = (amount: number, x: number, y: number) => {
-        this.zoomBuffer.amount += amount;
-        this.zoomBuffer.x = x;
-        this.zoomBuffer.y = y;
+    bufferZoom = (amount: number) => {
+        this.zoomBuffer += amount;
+    }
+
+    bufferMouse = (x: number, y: number) => {
+        this.mouseBuffer.x = x;
+        this.mouseBuffer.y = y;
     }
 
     private zoom = (amount: number, x: number, y: number) => {
         const tempZoom = Math.floor(this.zoomLevel);
-        if(this.zoomLevel == 0) {
+        if(this.zoomLevel === 0) {
             // trying to scroll into base plane: find the closest (open) child
             if(amount < 0) {
                 const closest = this.activeRoom.findExit(x, (1 - y));
@@ -105,11 +111,11 @@ class RoomSystem {
                     this.targetExit = null;
                     return;
                 }
-                this.material.uniforms.target.value = [
-                    closest.position.x - 1 / 16,
-                    closest.position.y - 1 / 16
-                ];
                 this.targetExit = closest;
+                this.targetOffset.x = closest.position.x - 1 / 16;
+                this.targetOffset.y = closest.position.y - 1 / 16;
+                this.currentOffset.x = this.targetOffset.x;
+                this.currentOffset.y = this.targetOffset.y;
             }
             // trying to scroll out of base plane: check if the current room has a parent
             if(amount > 0) {
@@ -119,21 +125,30 @@ class RoomSystem {
                 if(!this.parentRoom?.loaded) {
                     return;
                 }
-                this.material.uniforms.target.value = [
-                    this.parentExit.position.x - 1 / 16,
-                    this.parentExit.position.y - 1 / 16
-                ];
+                this.targetOffset.x = this.parentExit.position.x - 1 / 16;
+                this.targetOffset.y = this.parentExit.position.y - 1 / 16;
+                this.currentOffset.x = this.targetOffset.x;
+                this.currentOffset.y = this.targetOffset.y;
                 this.zoomLevel = 3;
             }
+        }
+        if((this.zoomLevel - amount) < 0.9 && amount < 0) {
+            const closest = this.activeRoom.findExit(x, (1 - y), this.zoomLevel, this.currentOffset);
+            this.targetExit = closest;
+            this.targetOffset.x = closest.position.x - 1 / 16;
+            this.targetOffset.y = closest.position.y - 1 / 16;
         }
         this.zoomLevel -= amount;
         if(this.zoomLevel < 0 || this.zoomLevel >= 3) {
             this.zoomLevel = 0;
+            //this.zoomBuffer = 0;
         }
         // check if texture needs an update
         const newZoom = Math.floor(this.zoomLevel);
         if(newZoom != tempZoom) {
             // room change!
+            this.currentOffset.x = this.targetOffset.x;
+            this.currentOffset.y = this.targetOffset.y;
             if(newZoom + tempZoom === 1) {
                 if(amount > 0) {
                     this.targetExit = this.parentExit;
@@ -150,7 +165,6 @@ class RoomSystem {
         }
         // set zoom uniform
         this.material.uniforms.zoom.value = 1 / Math.pow(2, this.zoomLevel % 1);
-        this.positionSpriteGroups();
     }
 
     private positionSpriteGroups = () => {
@@ -185,14 +199,19 @@ class RoomSystem {
             this.zoom(-delta * this.zoomSpeed, 0.3755, 0.25);
             this.zoomSpeed += delta * 0.0000002;
             this.zoomSpeed = Math.min(this.zoomSpeed, 0.004);
-            return;
+        } else if(this.zoomBuffer !== 0) {
+            const a = Math.abs(this.zoomBuffer) < 2 * delta ? this.zoomBuffer : 2 * delta * Math.sign(this.zoomBuffer);
+            this.zoom(a * Game.userData.settings.mouseSensitivity, this.mouseBuffer.x, this.mouseBuffer.y);
+            this.zoomBuffer -= a;
         }
-        if(this.zoomBuffer.amount === 0) {
-            return;
-        }
-        const a = Math.abs(this.zoomBuffer.amount) < 2 * delta ? this.zoomBuffer.amount : 2 * delta * Math.sign(this.zoomBuffer.amount);
-        this.zoom(a * Game.userData.settings.mouseSensitivity, this.zoomBuffer.x, this.zoomBuffer.y);
-        this.zoomBuffer.amount -= a;
+        const amount = (1.0 - Math.pow(0.75, delta / 16));
+        this.currentOffset.x += (this.targetOffset.x - this.currentOffset.x) * amount;
+        this.currentOffset.y += (this.targetOffset.y - this.currentOffset.y) * amount;
+        this.material.uniforms.target.value = [
+            this.currentOffset.x,
+            this.currentOffset.y,
+        ];
+        this.positionSpriteGroups();
     }
 
 }

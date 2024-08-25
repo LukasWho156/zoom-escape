@@ -105,7 +105,13 @@ class Room {
         }
     }
 
-    findExit = (x: number, y: number) => {
+    findExit = (x: number, y: number, zoomLevel?: number, offset?: {x: number, y: number}) => {
+        if(!!zoomLevel && !!offset) {
+            const zoom = Math.pow(2, zoomLevel);
+            x = (zoom - 1) * offset.x + x / zoom;
+            y = (zoom - 1) * offset.y + y / zoom;
+            console.log('offsetted thingy', x, y);
+        }
         let closest: Exit = null;
         let closestDistance: number = null;
         for(const exit of this.exits) {
