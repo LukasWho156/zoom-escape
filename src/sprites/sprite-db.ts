@@ -61,7 +61,9 @@ const SPRITES = {
                 gameState.deactivateSprite("door");
                 gameState.openExit('settlement', 'lobby')
                 gameState.dispatchEvent(new CustomEvent('win'));
-            } else {}
+            } else {
+                gameState.sfx('incorrect');
+            }
         })
     }}),
 

@@ -69,6 +69,8 @@ async function main() {
 
     await Game.loadTexture(play, 'play');
 
+    Game.loadSound(sfxSoundtrack, {id: 'soundtrack', loop: true});
+
     const promises = [
         Game.loadTexture(inventoryBg, 'inventory-bg'),
         Game.loadTexture(items, 'items', { framesX: 4, framesY: 3 }),
@@ -103,7 +105,6 @@ async function main() {
         Game.loadTexture(woodboards, 'sprite-woodboards', { framesX: 2, framesY: 2 }),
         Game.loadTexture(worm, 'sprite-worm'),
 
-        Game.loadSound(sfxSoundtrack, {id: 'soundtrack', loop: true}),
         Game.loadSound(sfxCollect, {id: 'collect'}),
         Game.loadSound(sfxFire, {id: 'fire'}),
         Game.loadSound(sfxFishingRod, {id: 'fishing-rod'}),

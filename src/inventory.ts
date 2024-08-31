@@ -1,4 +1,4 @@
-import { THREE } from "luthe-amp/lib/index";
+import { Game, THREE } from "luthe-amp/lib/index";
 import { ShaderSprite } from "luthe-amp/lib/graphics/utility/shader-sprite";
 import { MouseInteractionSystem } from "luthe-amp/lib/input/mouse-interaction-system";
 import { MouseInteractionComponent } from "luthe-amp/lib/input/mouse-interaction-component";
@@ -123,6 +123,7 @@ class Inventory {
                 this.remove(this.selectedItem);
                 this.remove(item);
                 this.addItem(c.target);
+                Game.audio.playSound('collect');
                 return;
             }
         }

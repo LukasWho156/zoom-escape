@@ -5,7 +5,6 @@ import { LoadingSystem } from "luthe-amp/lib/util/loading-system"
 import { LoadingShader } from "../shaders/loading-shader";
 import { MouseInteractionSystem } from "luthe-amp/lib/input/mouse-interaction-system";
 import { MouseInteractionComponent } from "luthe-amp/lib/input/mouse-interaction-component";
-import { makeMainScreen } from "./main-screen";
 import { makeStartScreen } from "./start-screen";
 
 const makeLoadScreen = (promises: Promise<any>[]) => {
@@ -41,6 +40,8 @@ const makeLoadScreen = (promises: Promise<any>[]) => {
     })
     mic.active = false;
     mis.add(mic);
+
+    let i = 0;
 
     const loadingSys = new LoadingSystem(promises, (percentage) => {
         LoadingShader.uniforms.percentage.value = percentage;
